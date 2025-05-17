@@ -1,4 +1,5 @@
 import React from 'react';
+import MainLayout from '../layouts/MainLayout';
 // Sample categories and products
 export const productCategories = [
     { id: 'diwali', name: 'Diwali' },
@@ -19,42 +20,44 @@ export const products = [
 
 export default function ProductsPage() {
     return (
-        <div className="container py-5">
-            <h2 className="text-center mb-4">Our Products</h2>
-            <p className="text-center text-muted mb-5">
-                Explore our curated collection for all your event and puja needs.
-            </p>
+        <MainLayout>
+            <div className="container">
+                <h2 className="text-center mb-4">Our Products</h2>
+                <p className="text-center text-muted mb-5">
+                    Explore our curated collection for all your event and puja needs.
+                </p>
 
-            {productCategories.map((category) => {
-                const categoryProducts = products.filter((p) => p.category === category.id);
+                {productCategories.map((category) => {
+                    const categoryProducts = products.filter((p) => p.category === category.id);
 
-                if (categoryProducts.length === 0) return null;
+                    if (categoryProducts.length === 0) return null;
 
-                return (
-                    <div key={category.id} className="mb-5">
-                        <h4 className="mb-4">{category.name}</h4>
-                        <div className="row">
-                            {categoryProducts.map((product) => (
-                                <div className="col-md-4 mb-4" key={product.id}>
-                                    <div className="card h-100 shadow-sm">
-                                        <img
-                                            src={product.image}
-                                            className="card-img-top"
-                                            alt={product.name}
-                                            style={{ height: '200px', objectFit: 'cover' }}
-                                        />
-                                        <div className="card-body d-flex flex-column text-center">
-                                            <h5 className="card-title">{product.name}</h5>
-                                            <p className="text-muted">{product.price}</p>
-                                            <a href="#" className="btn btn-primary mt-auto">Buy Now</a>
+                    return (
+                        <div key={category.id} className="mb-5">
+                            <h4 className="mb-4">{category.name}</h4>
+                            <div className="row">
+                                {categoryProducts.map((product) => (
+                                    <div className="col-md-4 mb-4" key={product.id}>
+                                        <div className="card h-100 shadow-sm">
+                                            <img
+                                                src={product.image}
+                                                className="card-img-top"
+                                                alt={product.name}
+                                                style={{ height: '200px', objectFit: 'cover' }}
+                                            />
+                                            <div className="card-body d-flex flex-column text-center">
+                                                <h5 className="card-title">{product.name}</h5>
+                                                <p className="text-muted">{product.price}</p>
+                                                <a href="#" className="btn btn-primary mt-auto">Buy Now</a>
+                                            </div>
                                         </div>
                                     </div>
-                                </div>
-                            ))}
+                                ))}
+                            </div>
                         </div>
-                    </div>
-                );
-            })}
-        </div>
+                    );
+                })}
+            </div>
+        </MainLayout>
     );
 }
