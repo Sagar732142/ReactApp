@@ -21,7 +21,7 @@ export const products = [
 export default function ProductsPage() {
     return (
         <MainLayout>
-            <div className="container">
+            <div className="container py-5">
                 <h2 className="text-center mb-4">Our Products</h2>
                 <p className="text-center text-muted mb-5">
                     Explore our curated collection for all your event and puja needs.
