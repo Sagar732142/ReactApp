@@ -37,7 +37,8 @@ export default function EventCategory() {
                                 image={item.image}
                                 title={item.title}
                                 description={"Celebrate the festival of lights with amazing gifts."}
-                                link={"#"}
+                                link={"/products/category/" + item.title}
+                                buttonText={"Shop Now"}
                             />
                         ))
                     }

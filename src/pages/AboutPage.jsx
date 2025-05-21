@@ -13,7 +13,7 @@ export default function AboutPage() {
                 <div className="row align-items-center">
                     <div className="col-md-6 mb-4 mb-md-0">
                         <img
-                            src="https://source.unsplash.com/600x400/?festival,puja,market"
+                            src="https://i.postimg.cc/KzxtqD9H/localhost-5173.png"
                             alt="Festival Items"
                             className="img-fluid rounded shadow-sm"
                         />

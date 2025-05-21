@@ -1,6 +1,8 @@
-export default function CategoryCard({ image, title, description, link }) {
+import { Link } from "react-router-dom";
+
+export default function CategoryCard({ image, title, description, link, buttonText }) {
     return (
-        <div className="col-md-4 mb-4 d-flex justify-content-center">
+        <div className="d-flex justify-content-center">
             <div className="card shadow-sm" style={{ width: '18rem', borderRadius: '10px' }}>
                 <img src={image} className="card-img-top" alt={title} style={{ height: '180px', objectFit: 'cover' }} />
                 <div className="card-body text-center">
@@ -8,9 +10,9 @@ export default function CategoryCard({ image, title, description, link }) {
                     <p className="card-text text-muted" style={{ fontSize: '0.9rem' }}>
                         {description}
                     </p>
-                    <a href={link} className="btn btn-primary">
-                        Explore
-                    </a>
+                    <Link to={link} className="btn btn-primary btn-sm">
+                        {buttonText ?? "Explore"}
+                    </Link>
                 </div>
             </div>
         </div>

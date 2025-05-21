@@ -1,5 +1,8 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import MainLayout from '../layouts/MainLayout';
+import { Link, useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import ProductSkeleton from '../components/ProductSkeleton ';
 // Sample categories and products
 export const productCategories = [
     { id: 'diwali', name: 'Diwali' },
@@ -18,7 +21,34 @@ export const products = [
 ];
 
 
+
+
 export default function ProductsPage() {
+
+    const [productsData, setProductsData] = useState([]);
+    const [categories, setCategories] = useState([]);
+    const [loading, setLoading] = useState(false);
+    const navigate = useNavigate();
+
+    const fetchData = async () => {
+        try {
+            setLoading(true)
+            const response = await api.get(`/products`);
+            setProductsData(response.data);
+            console.log(response.data);
+
+        } catch (error) {
+            console.error(error);
+        } finally {
+            setLoading(false);
+        }
+    }
+
+    useEffect(() => {
+        fetchData();
+    }, [])
+
+
     return (
         <MainLayout>
             <div className="container py-5">
@@ -27,7 +57,17 @@ export default function ProductsPage() {
                     Explore our curated collection for all your event and puja needs.
                 </p>
 
-                {productCategories.map((category) => {
+                {
+                    loading && <div className="row">
+                        {
+                            Array.from({ length: 8 }).map((_, index) => {
+                                return <ProductSkeleton key={index} />
+                            })
+                        }
+                    </div>
+                }
+
+                {/* {productCategories.map((category) => {
                     const categoryProducts = products.filter((p) => p.category === category.id);
 
                     if (categoryProducts.length === 0) return null;
@@ -48,7 +88,10 @@ export default function ProductsPage() {
                                             <div className="card-body d-flex flex-column text-center">
                                                 <h5 className="card-title">{product.name}</h5>
                                                 <p className="text-muted">{product.price}</p>
-                                                <a href="#" className="btn btn-primary mt-auto">Buy Now</a>
+                                                <Link to={`/products/product/${product.id}`}
+                                                    className="btn btn-primary mt-auto">
+                                                    Buy Now
+                                                </Link>
                                             </div>
                                         </div>
                                     </div>
@@ -56,7 +99,60 @@ export default function ProductsPage() {
                             </div>
                         </div>
                     );
-                })}
+                })} */}
+
+                <div className="row">
+                    {productsData.map((item) => {
+                        const product = item.products;
+
+                        return (
+                            <div className="col-sm-auto col-md-6 col-lg-4 col-xl-3 mb-4" key={product.pid}>
+                                <div
+                                    className="card h-100 shadow-sm"
+                                    style={{ cursor: 'pointer' }}
+                                    onClick={() => navigate(`/products/product/${product.pid}`)}
+                                >
+                                    <div className="position-relative">
+                                        <img
+                                            src={product.photos[0]}
+                                            alt={product.name}
+                                            className="card-img-top"
+                                            style={{ height: '200px', objectFit: 'cover' }}
+                                        />
+                                        {product.recommended && (
+                                            <span className="badge bg-warning text-dark position-absolute top-0 start-0 m-2">
+                                                ⭐ Recommended
+                                            </span>
+                                        )}
+                                    </div>
+                                    <div className="card-body d-flex flex-column">
+                                        <h5 className="card-title">{product.name}</h5>
+                                        <p className="card-text" style={{ fontSize: '0.9rem' }}>
+                                            {product.description}
+                                        </p>
+                                        <div className="mb-2">
+                                            <span className="fw-bold text-success">₹{product.price}</span>{' '}
+                                            <small className="text-muted text-decoration-line-through">
+                                                ₹{product.originalPrice}
+                                            </small>{' '}
+                                            <span className="badge bg-danger">{product.discountPercentage}% OFF</span>
+                                        </div>
+                                        {product.inventory === 0 && (
+                                            <div className="text-danger fw-semibold mb-2">Out of Stock</div>
+                                        )}
+                                        <Link
+                                            className="btn btn-primary btn-sm mt-auto"
+                                            to={`/products/product/${product.pid}`}
+                                        >
+                                            View Details
+                                        </Link>
+                                    </div>
+                                </div>
+                            </div>
+                        );
+                    })}
+                </div>
+
             </div>
         </MainLayout>
     );
