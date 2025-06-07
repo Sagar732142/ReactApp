@@ -17,7 +17,6 @@ export default function CategoryPage() {
 
             const res = await api.get(`/products/categories/${categoryId}`);
             setProducts(res.data); // assuming array of { products, categories }
-            console.log(res.data);
 
         } catch (error) {
             console.error(error);

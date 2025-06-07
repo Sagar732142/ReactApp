@@ -35,7 +35,6 @@ export default function ProductsPage() {
             setLoading(true)
             const response = await api.get(`/products`);
             setProductsData(response.data);
-            console.log(response.data);
 
         } catch (error) {
             console.error(error);

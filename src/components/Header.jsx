@@ -142,7 +142,7 @@ export default function Header() {
                                             `nav-link text-light px-2 link-hover pb-2 ${isActive ? 'active-link' : ''}`
                                         }
                                         title='Login'>
-                                        <LogIn size={20} />
+                                        <LogIn size={20} /> Login
                                     </NavLink>
                                 }
                             </li>
@@ -152,7 +152,7 @@ export default function Header() {
                                         `nav-link text-light px-2 link-hover pb-2 ${isActive ? 'active-link' : ''}`
                                     }
                                     title='Cart'>
-                                    <ShoppingCart size={20} />
+                                    <ShoppingCart size={20} /> Cart
                                 </NavLink>
                             </li>
                         </nav>
