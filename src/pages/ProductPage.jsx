@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import { Link, useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '../layouts/MainLayout';
 import { api } from '../api/client';
+import { useAuth } from '../context/AuthContext';
+import { toast } from 'react-toastify';
 
 
 
 export default function ProductPage() {
+    const { user, isLoggedIn } = useAuth();
     const { productId } = useParams();
     const navigate = useNavigate();
 
@@ -39,6 +42,36 @@ export default function ProductPage() {
     if (loading) return <div className="text-center py-5">Loading product details...</div>;
     if (error) return <div className="text-danger text-center py-5">{error}</div>;
     if (!product) return <div className="text-center py-5">Product not found.</div>;
+
+    const handleAddToCart = async () => {
+        if (!product.products || product.products.inventory === 0) {
+            toast.warn("This product is out of stock.");
+            return;
+        }
+
+
+
+        // Logic to add the product to the cart
+        // This could involve updating a global state or making an API call
+        // For now, just navigate to the cart page
+
+        try {
+            const response = await api.post('/cart', {
+                uid: user.id,
+                pdi: product.products.pid,
+                qyt: 1,
+            });
+
+            if (response.data) {
+                toast.success("Product added to cart successfully!");
+                // navigate('/cart'); // Redirect to cart page
+            }
+
+        } catch (error) {
+            console.error("Error adding product to cart:", error);
+            toast.error("Failed to add product to cart. Please try again later.");
+        }
+    }
 
     return (
         <MainLayout>
@@ -79,9 +112,11 @@ export default function ProductPage() {
                         {product.products?.inventory === 0 ? (
                             <div className="text-danger fw-bold mb-3">Out of Stock</div>
                         ) : (
-                            <Link to={`/cart`} className="btn btn-primary">
+                            <button
+                                onClick={handleAddToCart}
+                                className="btn btn-primary">
                                 Add to Cart
-                            </Link>
+                            </button>
                         )}
                     </div>
                 </div>

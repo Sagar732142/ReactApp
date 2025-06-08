@@ -1,43 +1,172 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useAuth } from '../context/AuthContext';
+import { useNavigate } from 'react-router-dom';
+import { api } from '../api/client';
+import { toast } from 'react-toastify';
+
 
 export default function CheckoutPage() {
+    const { isLoggedIn, user } = useAuth();
+    const navigate = useNavigate();
+    const [cart, setCart] = useState([]);
+
+    const [orderItems, setOrderItems] = useState([]); // State to manage order items
+    // State to manage form data
     const [formData, setFormData] = useState({
         fullName: '',
         email: '',
         phone: '',
+        vill: '',
+        po: '',
+        ps: '',
         address: '',
         city: '',
         state: '',
-        pincode: '',
+        zipCode: '',
     });
 
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const cart = [
-        { id: 1, name: 'Product A', price: 799, quantity: 1 },
-        { id: 2, name: 'Product B', price: 499, quantity: 2 },
-    ];
+
+    const fetchData = async () => {
+        try {
+            const response = await api.get(`/cart/user/${user.id}`);
+            const userRes = await api.get(`/users/${user.id}`);
+            if (!response.data || response.data.length === 0) {
+                console.warn("No cart data found for user:", user.id);
+                return;
+            }
+            console.log("Fetched cart data:", response.data);
+            setCart(response.data);
+            console.log("Fetched user data:", userRes.data);
+            setFormData({
+                fullName: userRes.data.name,
+                email: userRes.data.email,
+                phone: userRes.data.phone || '',
+                address: userRes.data.address || '',
+                vill: userRes.data.vill || '',
+                po: userRes.data.po || '',
+                ps: userRes.data.ps || '',
+                city: userRes.data.city || '',
+                state: userRes.data.state || '',
+                zipCode: userRes.data.zipCode || '',
+            });
+
+        }
+        catch (error) {
+            console.error("Error fetching cart data:", error);
+        }
+    };
+
+    // Fetch cart data when component mounts
+    useEffect(() => {
+        if (isLoggedIn) {
+            fetchData();
+        } else {
+            navigate('/login');
+        }
+    }, [isLoggedIn, navigate]);
+
+    useEffect(() => {
+        handleMapData();
+    }, [cart]);
 
     const total = cart.reduce(
-        (sum, item) => sum + item.price * item.quantity,
+        (sum, item) => sum + item.products.price * item.carts.qyt,
         0
     );
+
+    const originalPrice = cart.reduce(
+        (sum, item) => sum + item.products.originalPrice * item.carts.qyt,
+        0
+    );
+
+    const totalDiscount = originalPrice - total;
 
     const handleChange = (e) => {
         const { name, value } = e.target;
         setFormData(prev => ({ ...prev, [name]: value }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        setIsSubmitting(true);
-
-        // Mock API call or redirect to payment
-        setTimeout(() => {
-            alert('Order placed successfully!');
-            setIsSubmitting(false);
-        }, 1500);
+        if (isSubmitting) return; // Prevent multiple submissions
+        if (cart.length === 0) {
+            toast.warn('Your cart is empty!');
+            return;
+        }
+        await placeOrder();
     };
+
+    const handleMapData = () => {
+
+        const orderItems = cart.map(item => ({
+            productId: item.products.pid,
+            quantity: item.carts.qyt,
+            price: item.products.price,
+            discount: item.products.originalPrice - (item.products.price), // Assuming no discount for simplicity
+        }));
+
+        setOrderItems(orderItems);
+        console.log(orderItems);
+
+    }
+
+    const placeOrder = async () => {
+        setIsSubmitting(true);
+        await handleUpdateUserAddress();
+
+        try {
+            const orderData = {
+                userId: user.id,
+                paymentType: "CASH",
+                totalAmount: originalPrice,
+                discount: totalDiscount,
+                payableAmount: total,
+                status: 'INTRANSIT',
+                orderItems: orderItems,
+            };
+
+            const response = await api.post('/orders', orderData);
+            if (response.data) {
+                toast.success('Order placed successfully!');
+                setTimeout(() => {
+                    navigate('/thank-you?orderId=' + response.data.orderId);
+                }, 1500);
+            }
+        } catch (error) {
+            console.error("Error placing order:", error);
+            toast.error('Failed to place order. Please try again later.');
+        } finally {
+            setTimeout(() => {
+                setIsSubmitting(false);
+            }, 2000);
+        }
+    }
+
+    const handleUpdateUserAddress = async () => {
+        try {
+            const updatedData = {
+                name: formData.fullName,
+                email: formData.email,
+                phone: formData.phone,
+                vill: formData.vill,
+                po: formData.po,
+                ps: formData.ps,
+                address: formData.address,
+                city: formData.city,
+                state: formData.state,
+                zipCode: formData.zipCode,
+            };
+
+            const response = await api.patch(`/users/${user.id}`, updatedData);
+
+        } catch (error) {
+            console.error("Error updating user address:", error);
+            toast.error('Failed to update address. Please try again later.');
+        }
+    }
+
 
     return (
         <div className="container mt-5 mb-5">
@@ -84,6 +213,43 @@ export default function CheckoutPage() {
                             </div>
                         </div>
 
+                        <div className="row">
+                            <div className="col-md-4 mb-3">
+                                <label className="form-label">Village</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="vill"
+                                    value={formData.vill}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-4 mb-3">
+                                <label className="form-label">Post Office</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="po"
+                                    value={formData.po}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                            <div className="col-md-4 mb-3">
+                                <label className="form-label">Police Station</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    name="ps"
+                                    value={formData.ps}
+                                    onChange={handleChange}
+                                    required
+                                />
+                            </div>
+                        </div>
+
+
                         <div className="mb-3">
                             <label className="form-label">Address</label>
                             <textarea
@@ -124,8 +290,9 @@ export default function CheckoutPage() {
                                 <input
                                     type="text"
                                     className="form-control"
-                                    name="pincode"
-                                    value={formData.pincode}
+                                    name="zipCode"
+                                    pattern="\d{6}"
+                                    value={formData.zipCode}
                                     onChange={handleChange}
                                     required
                                 />
@@ -149,20 +316,29 @@ export default function CheckoutPage() {
                         <hr />
                         {cart.map((item) => (
                             <div
-                                key={item.id}
+                                key={item.carts.id}
                                 className="d-flex justify-content-between align-items-center mb-2"
                             >
                                 <div>
-                                    <strong>{item.name}</strong>
+                                    <strong>{item.products.name}</strong>
                                     <small className="d-block text-muted">
-                                        Qty: {item.quantity}
+                                        Qty: {item.carts.qyt} | Price: ₹{item.products.price} each
                                     </small>
                                 </div>
-                                <span>₹{item.price * item.quantity}</span>
+                                <span>₹{item.products.price * item.carts.qyt}</span>
                             </div>
                         ))}
                         <hr />
                         <div className="d-flex justify-content-between">
+                            <strong>Original Price</strong>
+                            <strong className='text-muted text-decoration-line-through'>₹{originalPrice}</strong>
+                        </div>
+                        <div className="d-flex justify-content-between">
+                            <strong>Discount</strong>
+                            <strong>₹{totalDiscount}</strong>
+                        </div>
+                        <hr />
+                        <div className="d-flex justify-content-between pt-2 mt-2">
                             <strong>Total</strong>
                             <strong>₹{total}</strong>
                         </div>

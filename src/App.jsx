@@ -13,6 +13,7 @@ import CheckoutPage from './pages/CheckoutPage'
 import ProfilePage from './pages/ProfilePage'
 import PrivateRoute from './components/PrivateRoute'
 import { ToastContainer } from 'react-toastify'
+import ThankYou from './pages/ThankYou'
 
 function App() {
 
@@ -35,7 +36,7 @@ function App() {
           <Route path="/cart" element={<PrivateRoute><CartPage /></PrivateRoute>} />
           <Route path="/checkout" element={<PrivateRoute><CheckoutPage /></PrivateRoute>} />
           <Route path="/profile" element={<PrivateRoute><ProfilePage /></PrivateRoute>} />
-
+          <Route path="/thank-you" element={<PrivateRoute><ThankYou /></PrivateRoute>} />
 
           <Route path='*' element={<NotFoundPage />} />
         </Routes>

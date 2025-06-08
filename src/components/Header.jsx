@@ -1,13 +1,44 @@
-import React, { useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { LogIn, BaggageClaim, AlignJustify, X, User, ShoppingBasket, ShoppingCart } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { NavLink, useNavigate } from 'react-router-dom';
+import { LogIn, BaggageClaim, AlignJustify, X, User, ShoppingBasket, ShoppingCart, BaggageClaimIcon, Badge } from 'lucide-react';
 import Logo from '../assets/image/logo.png'; // Adjust your path
 import { useAuth } from '../context/AuthContext';
+import { api } from '../api/client';
+
+
+
 
 export default function Header() {
-    const { isLoggedIn } = useAuth();
+    const { isLoggedIn, user } = useAuth();
+    const navigate = useNavigate();
 
     const [sidebar, setSidebar] = useState(false)
+    const [cart, setCart] = useState([]);
+
+    const fetchData = async () => {
+        try {
+            const response = await api.get(`/cart/user/${user.id}`);
+            if (!response.data || response.data.length === 0) {
+                console.warn("No cart data found for user:", user.id);
+                return;
+            }
+            console.log("Fetched cart data:", response.data);
+
+            setCart(response.data);
+        }
+        catch (error) {
+            console.error("Error fetching cart data:", error);
+        }
+    };
+
+    useEffect(() => {
+        if (isLoggedIn) {
+            fetchData();
+        } else {
+            navigate('/login');
+        }
+    }, [isLoggedIn, navigate]);
+
     return (
         <header className="py-3 shadow-sm sticky-top" style={{ background: "#0a0619" }}>
             <div className="container d-flex justify-content-between align-items-center">
@@ -64,6 +95,11 @@ export default function Header() {
                                 }
                                 title='Cart'>
                                 <ShoppingCart size={20} />
+                                {
+                                    isLoggedIn && <div className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>
+                                        {cart.length > 0 ? cart.reduce((acc, item) => acc + item.carts.qyt, 0) : 0}
+                                    </div>
+                                }
                             </NavLink>
                         </li>
 
@@ -153,6 +189,11 @@ export default function Header() {
                                     }
                                     title='Cart'>
                                     <ShoppingCart size={20} /> Cart
+                                    {
+                                        isLoggedIn && <div className='position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger'>
+                                            {cart.length > 0 ? cart.reduce((acc, item) => acc + item.carts.qyt, 0) : 0}
+                                        </div>
+                                    }
                                 </NavLink>
                             </li>
                         </nav>
