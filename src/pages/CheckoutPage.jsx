@@ -309,8 +309,8 @@ export default function CheckoutPage() {
                     </form>
                 </div>
 
-                {/* Order Summary */}
                 <div className="col-md-5">
+                    {/* Order Summary */}
                     <div className="border rounded p-4 shadow-sm">
                         <h5>Order Summary</h5>
                         <hr />
@@ -335,7 +335,7 @@ export default function CheckoutPage() {
                         </div>
                         <div className="d-flex justify-content-between">
                             <strong>Discount</strong>
-                            <strong>₹{totalDiscount}</strong>
+                            <strong>- ₹{totalDiscount}</strong>
                         </div>
                         <hr />
                         <div className="d-flex justify-content-between pt-2 mt-2">
@@ -343,8 +343,56 @@ export default function CheckoutPage() {
                             <strong>₹{total}</strong>
                         </div>
                     </div>
+
+                    {/* Payment Options */}
+                    <div className="border rounded p-4 shadow-sm mt-4">
+                        <h5>Payment Options</h5>
+                        <hr />
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="paymentMethod"
+                                id="cashOnDelivery"
+                                value="CASH"
+                                defaultChecked
+                            />
+                            <label className="form-check-label" htmlFor="cashOnDelivery">
+                                Cash on Delivery
+                            </label>
+                        </div>
+
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="paymentMethod"
+                                id="onlinePayment"
+                                value="ONLINE"
+                                disabled
+                            />
+                            <label className="form-check-label" htmlFor="onlinePayment">
+                                Online Payment
+                            </label>
+                        </div>
+                        <div className="form-check">
+                            <input
+                                className="form-check-input"
+                                type="radio"
+                                name="paymentMethod"
+                                id="upiPayment"
+                                value="UPI"
+                                disabled
+                            />
+                            <label className="form-check-label" htmlFor="upiPayment">
+                                UPI Payment
+                            </label>
+                        </div>
+                    </div>
                 </div>
+
             </div>
         </div>
+
     );
 }
