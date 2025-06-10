@@ -34,8 +34,6 @@ export default function Header() {
     useEffect(() => {
         if (isLoggedIn) {
             fetchData();
-        } else {
-            navigate('/login');
         }
     }, [isLoggedIn, navigate]);
 
