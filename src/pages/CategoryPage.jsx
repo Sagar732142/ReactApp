@@ -66,8 +66,8 @@ export default function CategoryPage() {
                                         )}
                                     </div>
                                     <div className="card-body d-flex flex-column">
-                                        <h5 className="card-title">{product.name}</h5>
-                                        <p className="card-text" style={{ fontSize: '0.9rem' }}>
+                                        <h5 className="card-title text-truncate-1">{product.name}</h5>
+                                        <p className="card-text text-truncate-2" style={{ fontSize: '0.9rem' }}>
                                             {product.description}
                                         </p>
                                         <div className="mb-2">
