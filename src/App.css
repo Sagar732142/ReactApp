@@ -223,3 +223,21 @@ body {
 .custom-nav-btn {
   transition: all 0.2s ease;
 }
+
+.text-truncate-1 {
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  /* limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.text-truncate-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  /* limit to 2 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
